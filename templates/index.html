@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('form').on('submit', function(event) {
+                req = $.ajax({
+                    url: '/process',
+                    type: 'POST',
+                    data : {
+                        latitude: $('#latitude').val(),
+                        longitude: $('#longitude').val(),
+                        timezone: $('#timezone').val(),
+                        model: $('#model').val(),
+                    }
+                });
+                req.done(function(data) {
+                    var graphs = JSON.parse(data);
+                    Plotly.newPlot("chart", graphs, {});
+                });
+                $("h3").text("Success!")
+                event.preventDefault();
+            })
+        })
+    </script>
+</head>
+
+<body style="font-family:arial, sans-serif">
+    <h1>how sun be?</h1>
+    <h2>irradiance forecasting made easy</h2>
+    <p>Using the superb pvlib library, this website can forecast near term solar irradiance. For more information about the different forecasting models available, please visit their website.</p>
+    <form id="form">
+    <label for="latitude">Latitude:</label>
+    <input type="number" id="latitude" name="latitude" step="any">
+    <label for="longitude">Longitude:</label>
+    <input type="number" id="longitude" name="longitude" step="any">
+    <label for="timezone">Timezone:</label>
+    <input type="text" id="timezone" name="timezone">
+    <label for="model">Choose forecast model:</label>
+    <select name="model" id="model">
+        <option value="GFS">GFS</option>
+        <option value="NAM">NAM</option>
+        <option value="NDFD">NDFD</option>
+        <option value="HRRR">HRRR</option>
+        <option value="RAP">RAP</option>
+    </select> 
+    <input type="submit" value="Submit">
+    </form>
+    <div id="chart" class="chart"></div>
+</body>
+
+<script>
+    d = {{ graphJSON | safe }};
+    Plotly.newPlot("chart", d, {});
+</script>
+
+</html>
